@@ -1,10 +1,7 @@
 /* eslint-disable react/jsx-max-props-per-line */
 import React, { useEffect, useState } from "react";
-
-import BlockIcon from "@mui/icons-material/Block";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import ViewIcon from "@mui/icons-material/Visibility";
+import SaveIcon from "@mui/icons-material/Save";
+import { Button } from "@mui/material";
 import {
   Table,
   TableBody,
@@ -13,9 +10,8 @@ import {
   TableRow,
   TablePagination,
   TableContainer,
-  Stack,
+  TableFooter,
   Box,
-  IconButton,
 } from "@mui/material";
 import OrganisationUnitsDropDown from "../components/OrganisationUnitDropDown";
 import conf from "../configurations/app.conf";
@@ -37,19 +33,39 @@ const SiteDataTable = () => {
   };
   const handleOnTextChange = (event) => {
     setSearchTerm(event.target.value);
+    setPage(0);
   };
 
-  const onChangeOrgUnit = (value) => {
-    console.log(JSON.stringify(value));
+  const onChangeOrgUnit = (MappingElementId, obj) => {
+    setMappingData((prev) => {
+      const newData = prev.map((item) => {
+        // Check if the current item's ID matches the MappingElementId
+        if (item.MESI_ID === MappingElementId) {
+          // If it matches, return a new object with updated values
+          return {
+            ...item,
+            DHIS2_ID: obj.value,
+            DHIS2_NOM: obj.label, // Assuming 'obj.label' contains the new name
+          };
+        }
+        // If it doesn't match, return the item as is
+        return item;
+      });
+      //console.log(JSON.stringify(newData));
+      return newData;
+    });
   };
 
-  const filteredData = mappingData
-    .filter(
-      (item) =>
-        item.MESI_NOM.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.DHIS2_NOM.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const filteredmappingData = mappingData.filter(
+    (item) =>
+      item.MESI_NOM.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.DHIS2_NOM.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredData = filteredmappingData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   useEffect(() => {
     try {
@@ -58,37 +74,27 @@ const SiteDataTable = () => {
         setMappingData(response.data);
       });
     } catch (error) {
+      setMappingData([]);
       console.log(error);
     }
-  }, [mappingData]);
-
-  const Input = (index, value) => {
-    return (
-      <div>
-        <input
-          id={`mesi-${index}`}
-          readOnly
-          type="text"
-          value={value}
-          style={{
-            paddingLeft: "10px",
-            paddingRight: "30px",
-            width: "100%",
-            height: "40px",
-            border: "solid 2px #A9A9A9",
-            borderRadius: "5px",
-            fontWeight: "bolder",
-            color: "#000",
-            fontSize: "13px",
-          }}
-        />
-      </div>
-    );
-  };
+  }, []);
 
   return (
     <>
-      <TableContainer sx={{ marginTop: "15px" }} style={{ border: "solid 1px #A7BCD1" }}>
+      <Box>
+        <Button
+          variant="contained"
+          startIcon={<SaveIcon style={{ fontSize: "large" }} />}
+          style={{ float: "right", borderRadius: "6px" }}
+          onClick={() => {
+            alert("Save Btn clicked");
+          }}
+        >
+          ENREGISTRER
+        </Button>
+      </Box>
+
+      <TableContainer sx={{ marginTop: "8px" }} style={{ border: "solid 1px #A7BCD1" }}>
         <Table size="small">
           <TableHead
             sx={{ backgroundColor: "#F4F6FA", borderBottom: "solid 2px #A7BCD1", height: 80 }}
@@ -124,14 +130,14 @@ const SiteDataTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredData.map((data, index) => {
+            {filteredData.map((data) => {
               return (
-                <TableRow key={`mapping-${index}`}>
+                <TableRow key={`mapping-${data.MESI_ID}`}>
                   <TableCell>
-                    <div>
+                    <Box>
                       <input
-                        id={`mesi-${index}`}
                         readOnly
+                        disabled
                         type="text"
                         value={data.MESI_NOM}
                         style={{
@@ -146,34 +152,41 @@ const SiteDataTable = () => {
                           fontSize: "13px",
                         }}
                       />
-                    </div>
+                    </Box>
                   </TableCell>
                   <TableCell>
                     <OrganisationUnitsDropDown
-                      optionSelected={null}
+                      optionSelected={{ label: data.DHIS2_NOM, value: data.DHIS2_ID }}
                       onChangeOrgUnit={onChangeOrgUnit}
+                      MappingElementId={data.MESI_ID}
                     />
                   </TableCell>
                 </TableRow>
               );
             })}
           </TableBody>
+          <TableFooter sx={{ backgroundColor: "#F4F6FA" }}>
+            <TableRow>
+              <TableCell style={{ padding: 0 }} align="right" colSpan={2}>
+                <TablePagination
+                  style={{ borderTop: "0px solid #A7BCD1", float: "right" }}
+                  rowsPerPageOptions={[5, 10, 25]}
+                  component="div"
+                  count={filteredmappingData.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={(event, newPage) => {
+                    handleChangePage(event, newPage);
+                  }}
+                  onRowsPerPageChange={(event) => {
+                    handleChangeRowsPerPage(event, +event.target.value);
+                  }}
+                />
+              </TableCell>
+            </TableRow>
+          </TableFooter>
         </Table>
       </TableContainer>
-      <TablePagination
-        style={{ borderTop: "2px solid #A7BCD1" }}
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={mappingData.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={(event, newPage) => {
-          handleChangePage(event, newPage);
-        }}
-        onRowsPerPageChange={(event) => {
-          handleChangeRowsPerPage(event, +event.target.value);
-        }}
-      />
     </>
   );
 };

@@ -5,35 +5,26 @@ import conf from "../configurations/app.conf";
 import { v4 as uuidv4 } from "uuid";
 import Select from "react-select";
 
-const OrganisationUnitsDropDown = ({ optionSelected, onChangeOrgUnit, MappingElementId }) => {
+const TestDDL = ({ optionSelected, onChangeOrgUnit }) => {
   const [data, setData] = useState([]);
   const [selectedOption, setSelectedOption] = useState(optionSelected);
   const isExecuted = useRef(true);
 
   useEffect(() => {
-    //if (isExecuted.current) {
+    // if (isExecuted.current) {
     // isExecuted.current = false;
     try {
       const url = conf.SERVERS.API_SERVER + conf.RESOURCES.ORGANISATION_UNITS;
       axios.get(url).then((response) => {
-        const options = response.data.map((unit) => {
-          const val = {
-            value: unit.Id,
-            label: unit.Nom,
-          };
-          return val;
-        });
-        setData(options);
-        //setData(response.data);
+        setData(response.data);
       });
     } catch (error) {
       console.log(error);
     }
-    // }
-  }, []);
+  }, [data]);
 
   return (
-    <Select
+    <select
       id={uuidv4()}
       style={{
         paddingLeft: "10px",
@@ -46,17 +37,23 @@ const OrganisationUnitsDropDown = ({ optionSelected, onChangeOrgUnit, MappingEle
         color: "#000",
         fontSize: "13px",
       }}
-      defaultValue={selectedOption}
-      onChange={(value) => {
-        setSelectedOption(value);
-        onChangeOrgUnit(MappingElementId, value);
+      value={selectedOption}
+      onChange={(event) => {
+        setSelectedOption(event.target.value);
+        onChangeOrgUnit(event.target.value);
         //alert(JSON.stringify(value));
       }}
-      options={data}
-      isSearchable={true}
-      placeholder="Selectionner Organisation Unit"
-    />
+    >
+      <option value={0}></option>
+      {data.map((element, index) => {
+        return (
+          <option key={`unit-index-${index}`} value={element.Id}>
+            {element.Nom}
+          </option>
+        );
+      })}
+    </select>
   );
 };
 
-export default OrganisationUnitsDropDown;
+export default TestDDL;
