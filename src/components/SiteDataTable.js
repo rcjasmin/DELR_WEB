@@ -67,16 +67,20 @@ const SiteDataTable = () => {
     page * rowsPerPage + rowsPerPage
   );
 
-  useEffect(() => {
+  const getData = async () => {
     try {
       const url = conf.SERVERS.API_SERVER + conf.RESOURCES.MAPPING_SITE_ORG_UNITS;
-      axios.get(url).then((response) => {
+      await axios.get(url).then((response) => {
         setMappingData(response.data);
       });
     } catch (error) {
       setMappingData([]);
       console.log(error);
     }
+  };
+
+  useEffect(() => {
+    getData();
   }, []);
 
   return (
