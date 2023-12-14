@@ -13,11 +13,11 @@ import {
   TableFooter,
   Box,
 } from "@mui/material";
-import OrganisationUnitsDropDown from "../components/OrganisationUnitDropDown";
 import conf from "../configurations/app.conf";
 import axios from "axios";
+import DataElementDropDown from "./DataElementDropDown";
 
-const SiteDataTable = () => {
+const IndicateurDataTable = () => {
   const [mappingData, setMappingData] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -36,7 +36,7 @@ const SiteDataTable = () => {
     setPage(0);
   };
 
-  const onChangeOrgUnit = (MappingElementId, obj) => {
+  const onChangeDataElement = (MappingElementId, obj) => {
     setMappingData((prev) => {
       const newData = prev.map((item) => {
         // Check if the current item's ID matches the MappingElementId
@@ -58,8 +58,8 @@ const SiteDataTable = () => {
 
   const filteredmappingData = mappingData.filter(
     (item) =>
-      item?.MESI_NOM?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item?.DHIS2_NOM?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      item?.MESI_NOM?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item?.DHIS2_NOM?.toString().includes(searchTerm.toLowerCase())
   );
 
   const filteredData = filteredmappingData.slice(
@@ -69,7 +69,7 @@ const SiteDataTable = () => {
 
   const getData = async () => {
     try {
-      const url = conf.SERVERS.API_SERVER + conf.RESOURCES.MAPPING_SITE_ORG_UNITS;
+      const url = conf.SERVERS.API_SERVER + conf.RESOURCES.MAPPING_INDICATEUR_DTEELEMENT;
       await axios.get(url).then((response) => {
         setMappingData(response.data);
       });
@@ -127,9 +127,9 @@ const SiteDataTable = () => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell style={{ fontWeight: "bold", width: "50%" }}>SITE MESI</TableCell>
+              <TableCell style={{ fontWeight: "bold", width: "50%" }}>INDICATEUR MESI</TableCell>
               <TableCell style={{ fontWeight: "bold", width: "50%" }}>
-                ORGANISATION UNIT DHIS2
+                DATA ELEMENT DHIS2
               </TableCell>
             </TableRow>
           </TableHead>
@@ -139,6 +139,7 @@ const SiteDataTable = () => {
                 <TableRow key={`mapping-${data.MESI_ID}`}>
                   <TableCell>
                     <Box>
+                      
                       <input
                         readOnly
                         disabled
@@ -159,9 +160,9 @@ const SiteDataTable = () => {
                     </Box>
                   </TableCell>
                   <TableCell>
-                    <OrganisationUnitsDropDown
+                    <DataElementDropDown
                       optionSelected={{ label: data.DHIS2_NOM, value: data.DHIS2_ID }}
-                      onChangeOrgUnit={onChangeOrgUnit}
+                      onChangeDataElement={onChangeDataElement}
                       MappingElementId={data.MESI_ID}
                     />
                   </TableCell>
@@ -195,4 +196,4 @@ const SiteDataTable = () => {
   );
 };
 
-export default SiteDataTable;
+export default IndicateurDataTable;

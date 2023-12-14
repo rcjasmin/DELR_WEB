@@ -7,8 +7,7 @@ import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import TabsMenu from "src/components/TabsMenu";
 import React, { useEffect, useState } from "react";
 import SiteDataTable from "src/components/SiteDataTable";
-import appService from "../services/appService";
-import OrganisationUnitsDropDown from "../components/OrganisationUnitDropDown";
+import IndicateurDataTable from "src/components/IndicateurDataTable";
 
 const Page = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -30,7 +29,9 @@ const Page = () => {
         <Container maxWidth="lg">
           <Stack>
             <TabsMenu activeTab={tabIndex} handleTabChange={handleTabChange} />
-            <SiteDataTable />
+            {tabIndex ===0 && <SiteDataTable /> }
+            {tabIndex ===1 && <IndicateurDataTable /> }
+         
           </Stack>
         </Container>
       </Box>

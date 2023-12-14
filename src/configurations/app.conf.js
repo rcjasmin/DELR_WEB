@@ -6,6 +6,8 @@ const SERVERS = {
 const RESOURCES = {
   ORGANISATION_UNITS: "/api/organisationUnits",
   MAPPING_SITE_ORG_UNITS: "/api/mapping/site",
+  DATA_ELEMENT: "/api/dataElements",
+  MAPPING_INDICATEUR_DTEELEMENT: "/api/mapping/indicateur",
 };
 
 export default { SERVERS, RESOURCES };
