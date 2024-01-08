@@ -11,25 +11,25 @@ const OrganisationUnitsDropDown = ({ optionSelected, onChangeOrgUnit, MappingEle
   const isExecuted = useRef(true);
 
   useEffect(() => {
-    //if (isExecuted.current) {
-    // isExecuted.current = false;
-    try {
-      const url = conf.SERVERS.API_SERVER + conf.RESOURCES.ORGANISATION_UNITS;
-      axios.get(url).then((response) => {
-        const options = response.data.map((unit) => {
-          const val = {
-            value: unit.Id,
-            label: unit.Nom,
-          };
-          return val;
+    if (isExecuted.current) {
+      isExecuted.current = false;
+      try {
+        const url = conf.SERVERS.API_SERVER + conf.RESOURCES.ORGANISATION_UNITS;
+        axios.get(url).then((response) => {
+          const options = response.data.map((unit) => {
+            const val = {
+              value: unit.Id,
+              label: unit.Nom,
+            };
+            return val;
+          });
+          setData(options);
+          //setData(response.data);
         });
-        setData(options);
-        //setData(response.data);
-      });
-    } catch (error) {
-      console.log(error);
+      } catch (error) {
+        console.log(error);
+      }
     }
-    // }
   }, []);
 
   return (

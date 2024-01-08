@@ -8,6 +8,9 @@ const RESOURCES = {
   MAPPING_SITE_ORG_UNITS: "/api/mapping/site",
   DATA_ELEMENT: "/api/dataElements",
   MAPPING_INDICATEUR_DTEELEMENT: "/api/mapping/indicateur",
+  CATEGORY_OPTION_COMBO: "/api/categoryOptionCombos",
+  UTILISATEURS: "/api/utilisateurs",
+  DEPARTEMENTS: "/api/departements",
 };
 
 export default { SERVERS, RESOURCES };

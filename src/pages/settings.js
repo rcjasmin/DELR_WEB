@@ -26,12 +26,11 @@ const Page = () => {
           flexGrow: 1,
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="xl">
           <Stack>
             <TabsMenu activeTab={tabIndex} handleTabChange={handleTabChange} />
-            {tabIndex ===0 && <SiteDataTable /> }
-            {tabIndex ===1 && <IndicateurDataTable /> }
-         
+            {tabIndex === 0 && <SiteDataTable />}
+            {tabIndex === 1 && <IndicateurDataTable />}
           </Stack>
         </Container>
       </Box>

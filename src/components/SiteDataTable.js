@@ -16,12 +16,18 @@ import {
 import OrganisationUnitsDropDown from "../components/OrganisationUnitDropDown";
 import conf from "../configurations/app.conf";
 import axios from "axios";
+import MessageBox from "./MessageBox";
+import SuccessBox from "./SuccessBox";
+import ConfirmDialog from "./ConfirmDialog";
 
 const SiteDataTable = () => {
   const [mappingData, setMappingData] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [confirmationMessage, setConfirmationMessage] = useState(null);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -56,6 +62,31 @@ const SiteDataTable = () => {
     });
   };
 
+  const handleOnConfirm = () => {
+    setConfirmationMessage(null);
+
+    const data = mappingData.filter((element) => element.DHIS2_ID != 0);
+    let isValid = true;
+
+    outerloop: for (let i = 0; i < data.length; i++) {
+      for (let j = i + 1; j < data.length; j++) {
+        if (data[i].DHIS2_ID === data[j].DHIS2_ID) {
+          setError(
+            'Variable:  "' + data[i].DHIS2_NOM + '" est mappée plusieurs fois. Veuillez corriger.'
+          );
+          isValid = false;
+
+          break outerloop;
+        }
+      }
+    }
+
+    if (isValid) {
+      const requestData = { mappingData: data, userId: 1 };
+      save(requestData);
+    }
+  };
+
   const filteredmappingData = mappingData.filter(
     (item) =>
       item?.MESI_NOM?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -83,15 +114,57 @@ const SiteDataTable = () => {
     getData();
   }, []);
 
+  const save = async (data) => {
+    try {
+      const url = conf.SERVERS.API_SERVER + conf.RESOURCES.MAPPING_SITE_ORG_UNITS;
+      await axios.post(url, data).then((response) => {
+        if (response.status === 200) {
+          setSuccessMessage("Enregistrement éffectué avec success");
+          function delay(vtime) {
+            return new Promise((resolve) => setTimeout(resolve, vtime));
+          }
+
+          delay(1000).then(() => {
+            setSuccessMessage(null);
+          });
+        }
+      });
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   return (
     <>
       <Box>
+        {successMessage != null && (
+          <SuccessBox
+            message={successMessage}
+            onClose={() => {
+              setSuccessMessage(null);
+            }}
+          />
+        )}
+
+        {confirmationMessage != null && (
+          <ConfirmDialog
+            message={confirmationMessage}
+            OnCancel={() => {
+              setConfirmationMessage(null);
+            }}
+            OnConfirm={handleOnConfirm}
+          />
+        )}
+
+        {error != null && <MessageBox severity="error" message={error} />}
+
         <Button
           variant="contained"
           startIcon={<SaveIcon style={{ fontSize: "large" }} />}
           style={{ float: "right", borderRadius: "6px" }}
           onClick={() => {
-            alert("Save Btn clicked");
+            setError(null);
+            setConfirmationMessage("Voulez vous vraiment sauvegarder?");
           }}
         >
           ENREGISTRER
@@ -191,6 +264,7 @@ const SiteDataTable = () => {
           </TableFooter>
         </Table>
       </TableContainer>
+      <br />
     </>
   );
 };

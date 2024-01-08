@@ -5,7 +5,11 @@ import conf from "../configurations/app.conf";
 import { v4 as uuidv4 } from "uuid";
 import Select from "react-select";
 
-const DataElementDropDown = ({ optionSelected, onChangeDataElement, MappingElementId }) => {
+const CategoryOptionComboDropDown = ({
+  optionSelected,
+  onChangeCategoryOptionCombo,
+  MappingElementId,
+}) => {
   const [data, setData] = useState([]);
   const [selectedOption, setSelectedOption] = useState(optionSelected);
   const isExecuted = useRef(true);
@@ -14,7 +18,7 @@ const DataElementDropDown = ({ optionSelected, onChangeDataElement, MappingEleme
     if (isExecuted.current) {
       isExecuted.current = false;
       try {
-        const url = conf.SERVERS.API_SERVER + conf.RESOURCES.DATA_ELEMENT;
+        const url = conf.SERVERS.API_SERVER + conf.RESOURCES.CATEGORY_OPTION_COMBO;
         axios.get(url).then((response) => {
           const options = response.data.map((unit) => {
             const val = {
@@ -49,14 +53,13 @@ const DataElementDropDown = ({ optionSelected, onChangeDataElement, MappingEleme
       defaultValue={selectedOption}
       onChange={(value) => {
         setSelectedOption(value);
-        onChangeDataElement(MappingElementId, value);
-        //alert(JSON.stringify(value));
+        onChangeCategoryOptionCombo(MappingElementId, value);
       }}
       options={data}
       isSearchable={true}
-      placeholder="Selectionner Data Element"
+      placeholder="Selectionner category Opt Combo"
     />
   );
 };
 
-export default DataElementDropDown;
+export default CategoryOptionComboDropDown;
