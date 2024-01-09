@@ -69,18 +69,18 @@ const UtilisateurModalForm = ({ openClose, onCloseModal, mode, currentuser, onFo
         shouldDirty: true,
       });
 
-      setValue("departement", currentuser.DepartementId, {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldDirty: true,
-      });
-
       setValue("statut", currentuser.Statut, {
         shouldValidate: true,
         shouldDirty: true,
         shouldDirty: true,
       });
-      //alert(JSON.stringify(currentuser));
+
+      setValue("departement", currentuser.DepartementId, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldDirty: true,
+      });
+      // alert(JSON.stringify(currentuser));
     }
   }, [currentuser, mode, reset, setValue]);
 
@@ -125,10 +125,48 @@ const UtilisateurModalForm = ({ openClose, onCloseModal, mode, currentuser, onFo
     }
   };
 
+  const updateUser = async (data) => {
+    try {
+      const url = conf.SERVERS.API_SERVER + conf.RESOURCES.UTILISATEURS;
+      await axios.put(url, data).then((response) => {
+        if (response.status === 200) {
+          const results = response.data;
+
+          if (results.CODE_MESSAGE === "SUCCESS") {
+            setSuccessMessage(results.MESSAGE);
+            function delay(vtime) {
+              return new Promise((resolve) => setTimeout(resolve, vtime));
+            }
+
+            delay(1500).then(() => {
+              setSuccessMessage(null);
+              reset();
+              onCloseModal(false);
+              onFormSubmit();
+            });
+          } else {
+            setError(results.MESSAGE);
+          }
+        }
+      });
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   const handleOnConfirm = () => {
     setConfirmationMessage(null);
     const userData = { data: formData, userId: 1 };
-    addUser(userData);
+
+    switch (mode) {
+      case "ADD":
+        addUser(userData);
+        break;
+
+      case "EDIT":
+        updateUser(userData);
+        break;
+    }
   };
 
   return (
@@ -340,7 +378,11 @@ const UtilisateurModalForm = ({ openClose, onCloseModal, mode, currentuser, onFo
                   >
                     Departement
                   </Typography>
-                  <DepartementDropDown register={register} />
+                  <DepartementDropDown
+                    register={register}
+                    name="departement"
+                    //selectedDepartement={currentuser?.DepartementId}
+                  />
                   {errors.departement && (
                     <Typography sx={{ fontSize: 12, fontWeight: "bold" }} color="error">
                       {errors.departement.message}

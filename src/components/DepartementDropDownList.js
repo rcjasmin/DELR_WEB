@@ -6,7 +6,6 @@ import conf from "../configurations/app.conf";
 const DepartementDropDown = ({ register }) => {
   const [departements, setDepartements] = useState([]);
   const isExecuted = useRef(true);
-
   useEffect(() => {
     if (isExecuted.current) {
       isExecuted.current = false;
