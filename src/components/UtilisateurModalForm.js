@@ -380,8 +380,7 @@ const UtilisateurModalForm = ({ openClose, onCloseModal, mode, currentuser, onFo
                   </Typography>
                   <DepartementDropDown
                     register={register}
-                    name="departement"
-                    //selectedDepartement={currentuser?.DepartementId}
+                    selectedDepartement={currentuser?.DepartementId}
                   />
                   {errors.departement && (
                     <Typography sx={{ fontSize: 12, fontWeight: "bold" }} color="error">

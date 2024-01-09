@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import conf from "../configurations/app.conf";
 
-const DepartementDropDown = ({ register }) => {
+const DepartementDropDown = ({ register,selectedDepartement }) => {
   const [departements, setDepartements] = useState([]);
   const isExecuted = useRef(true);
   useEffect(() => {
@@ -14,6 +14,7 @@ const DepartementDropDown = ({ register }) => {
         axios.get(url).then((response) => {
           setDepartements(response.data);
         });
+       
       } catch (error) {
         console.log(error);
       }
@@ -40,8 +41,12 @@ const DepartementDropDown = ({ register }) => {
     >
       <option value="">Selectionner Departement</option>
       {departements.map((departement) => {
+        let selected =  false;
+        if((departement.Id ==selectedDepartement)){
+          selected =  true;
+        }
         return (
-          <option key={departement.Id} value={departement.Id}>
+          <option key={departement.Id} value={departement.Id} selected={selected}>
             {departement.NomDepartement}
           </option>
         );
